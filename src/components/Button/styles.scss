@@ -1,0 +1,36 @@
+@import '../../styles';
+
+.c-button {
+  $l-border-radius: rem(13px);
+
+  position: relative;
+  z-index: 0;
+  display: flex;
+  padding: rem(2px);
+  border-radius: $l-border-radius;
+  box-shadow: rem(2px) rem(3px) rem(9px) rem(2px) rgba(95, 109, 255, 0.4685),
+    0 0 rem(4px) rgba(0, 0, 0, 0.5);
+
+  &__border {
+    @extend %fill;
+
+    position: absolute;
+    z-index: -1;
+    background: linear-gradient(270deg, #9faaea 0%, #6c80ff 100%);
+    border-radius: $l-border-radius;
+  }
+
+  &__content {
+    @extend %btn-clean;
+
+    flex: 1;
+    padding: spacing(normal) spacing(xxlarge) spacing(xsmall);
+    background: linear-gradient(270deg, #2f5d95 0%, #5264d7 100%);
+    border-radius: $l-border-radius - rem(1px);
+    box-shadow: rem(8px) rem(-1px) rem(10px) rem(2px) rgba(59, 77, 235, 0.5) inset,
+      0 rem(4px) rem(10px) rgba(89, 147, 255, 0.8328) inset;
+    color: $g-colors-text-light;
+    font-family: $g-font-family-head;
+    font-size: rem(32px);
+  }
+}

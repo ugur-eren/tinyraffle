@@ -1,3 +1,5 @@
+@import './abstracts/partials';
+
 // Spacing
 .w-limited {
   @include by-breakpoint(max-width, $container-max-widths);
@@ -247,29 +249,16 @@
   overflow-y: visible;
 }
 
-.btn-clean {
-  padding: 0;
-  border: 0;
-  background-color: transparent;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-}
-
 .img-fluid {
   max-width: 100%;
   height: auto;
 }
 
-// Fill
-%fill {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+.btn-clean {
+  @extend %btn-clean;
 }
+
+// Fill
 
 .absolute-fill {
   @extend %fill;
