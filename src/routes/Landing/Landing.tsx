@@ -38,7 +38,19 @@ const Landing: React.FC = () => {
         <div className="p-landing__divider" />
 
         <div className="p-landing__right">
-          <h1>Mini Raffle</h1>
+          <div className="p-landing__right__header">
+            <h1 className="p-landing__right__header__title">Mini Raffle</h1>
+            <span className="p-landing__right__header__description">Make a Raffle in 3 steps</span>
+          </div>
+
+          <div className="p-landing__right__result">
+            <h3 className="p-landing__right__result__title">RESULT:</h3>
+            <span className="p-landing__right__result__description">####</span>
+
+            <a href="#proof" className="p-landing__right__result__proof-link">
+              CLICK FOR PROOF
+            </a>
+          </div>
         </div>
       </div>
     </div>
