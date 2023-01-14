@@ -1,3 +1,17 @@
+@import './styles';
+
+$l-font-formats: ('woff2', 'woff', 'ttf', 'otf') !default;
+
+@include font-face('Campton', '/assets/fonts/Campton/CamptonBold', 700, 'normal', $l-font-formats);
+@include font-face('Campton', '/assets/fonts/Campton/CamptonBook', 400, 'normal', $l-font-formats);
+@include font-face(
+  'Bebas Neue',
+  '/assets/fonts/BebasNeue/BebasNeue-Regular',
+  400,
+  'normal',
+  $l-font-formats
+);
+
 html {
   scroll-behavior: smooth;
 }
