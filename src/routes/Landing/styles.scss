@@ -7,6 +7,32 @@
   align-items: center;
 
   &__content {
-    width: 100%;
+    display: grid;
+    grid-template: 'left divider right' / 1fr auto auto;
+    gap: 0 0;
+  }
+
+  &__left {
+    grid-area: left;
+  }
+
+  &__divider {
+    width: rem(7px);
+    height: 100%;
+    grid-area: divider;
+    margin-right: spacing(medium);
+    margin-left: spacing(xlarge);
+    background: linear-gradient(
+      360deg,
+      rgba(100, 82, 255, 0) 0%,
+      rgba(94, 94, 255, 0.43) 33%,
+      #3c9aff 61%,
+      #3529ff 85%,
+      rgba(53, 41, 255, 0) 100%
+    );
+  }
+
+  &__right {
+    grid-area: right;
   }
 }
