@@ -1,6 +1,6 @@
 @import '../../styles';
 
-.c-button {
+.c-form-element {
   $l-border-radius: rem(13px);
 
   position: relative;
@@ -20,7 +20,8 @@
     border-radius: $l-border-radius;
   }
 
-  &__content {
+  button,
+  input {
     @extend %btn-clean;
 
     flex: 1;
@@ -32,5 +33,12 @@
     color: $g-colors-text-light;
     font-family: $g-font-family-head;
     font-size: rem(32px);
+  }
+
+  input {
+    background: linear-gradient(270deg, #242949 0%, #0b0c11 100%);
+    cursor: text;
+    outline: none;
+    text-align: center;
   }
 }
