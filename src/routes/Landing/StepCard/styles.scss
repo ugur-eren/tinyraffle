@@ -1,0 +1,58 @@
+@import '../../../styles';
+
+.c-step-card {
+  $l-border-radius: rem(7px);
+
+  @include margin-vertical(spacing(xsmall));
+
+  position: relative;
+  display: flex;
+  padding: rem(2px);
+  border-radius: $l-border-radius;
+  box-shadow: rem(2px) rem(3px) rem(9px) rem(2px) rgba(95, 109, 255, 0.4685),
+    0 0 rem(4px) rgba(0, 0, 0, 0.5);
+
+  &__border {
+    @extend %fill;
+
+    position: absolute;
+    z-index: -1;
+    background: linear-gradient(270deg, #9faaea 0%, #6c80ff 100%);
+    border-radius: $l-border-radius;
+  }
+
+  &__content {
+    display: flex;
+    gap: spacing(normal);
+    flex: 1;
+    flex-direction: row;
+    padding: spacing(large);
+    padding-left: spacing(xxlarge);
+    background: linear-gradient(270deg, #171c41 0%, #0b0c11 100%);
+    border-radius: $l-border-radius - rem(1px);
+    box-shadow: rem(8px) rem(-1px) rem(10px) rem(2px) rgba(59, 77, 235, 0.5) inset,
+      0 rem(4px) rem(10px) rgba(89, 147, 255, 0.8328) inset;
+
+    &__left {
+      flex: 1;
+      font-size: rem(24px);
+      font-weight: 700;
+
+      h4 {
+        margin-bottom: spacing(xsmall);
+      }
+
+      p {
+        color: $g-colors-text-strong;
+        font-size: rem(16px);
+        font-weight: 400;
+      }
+    }
+
+    &__right {
+      display: flex;
+      gap: spacing(xxsmall);
+      flex-direction: column;
+    }
+  }
+}
