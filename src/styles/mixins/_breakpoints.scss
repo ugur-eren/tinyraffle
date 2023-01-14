@@ -1,0 +1,12 @@
+@use 'sass:math';
+@use 'sass:list';
+@use 'sass:map';
+
+// Maps values to breakpoints in media styles
+@mixin by-breakpoint($property, $values: $container-max-widths, $breakpoints: $grid-breakpoints) {
+  @each $key, $value in $values {
+    @media (min-width: map.get($breakpoints, $key)) {
+      #{$property}: $value;
+    }
+  }
+}

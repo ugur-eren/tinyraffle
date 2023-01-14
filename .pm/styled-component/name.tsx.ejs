@@ -1,0 +1,14 @@
+import cx from 'classnames';
+import {<%= props.name %>Props} from './<%= props.name %>.props';
+
+import './<%= props.name %>.styles.css';
+
+const <%= props.name %>: React.FC<<%= props.name %>Props> = (props) => {
+  return (
+    <div className={cx('<%= props.nameKebabCase %>')}>
+      <div />
+    </div>
+  );
+};
+
+export default <%= props.name %>;

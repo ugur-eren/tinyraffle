@@ -1,0 +1,28 @@
+$grid-columns: 12 !default;
+$grid-gutter-width: 1.5rem !default;
+
+// stylelint-disable-next-line meowtec/no-px
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+) !default;
+
+// stylelint-disable-next-line meowtec/no-px
+$container-max-widths: (
+  xs: none,
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1320px,
+) !default;
+
+// Button Border
+$g-button-border-style: rem(2px) solid !default;
+
+// Z-Indexes
+$g-index-background: -1 !default;

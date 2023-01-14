@@ -1,0 +1,12 @@
+@use 'sass:math';
+
+$g-spacings: (
+  normal: rem(14px),
+  small: rem(10px),
+  xsmall: rem(8px),
+  2xsmall: rem(5px),
+  medium: rem(24px),
+  large: rem(36px),
+  xlarge: rem(44px),
+  xxlarge: rem(66px),
+) !default;

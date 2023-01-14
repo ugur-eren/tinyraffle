@@ -1,0 +1,52 @@
+{
+  "CreateFC": {
+    "scope": "javascript,javascriptreact,typescript,typescriptreact",
+    "prefix": "crFC",
+    "description": "Create a empty function component",
+    "body": [
+      "const ${TM_FILENAME_BASE}$1: React.$2FC = (props) => {",
+      "  const {$3} = props;",
+      "",
+      "  return (",
+      "    <div>",
+      "      <div />",
+      "    </div>",
+      "  );",
+      "};",
+      "",
+      "export default ${TM_FILENAME_BASE}$1;",
+      ""
+    ]
+  },
+
+  "CreateStyledFC": {
+    "scope": "javascript,javascriptreact,typescript,typescriptreact",
+    "prefix": "crStyledFC",
+    "description": "Create a function component with SCSS styles",
+    "body": [
+      "import cx from 'classnames';",
+      "",
+      "import './styles.scss';",
+      "",
+      "const ${TM_FILENAME_BASE}$1: React.$2FC = (props) => {",
+      "  const {$3} = props;",
+      "",
+      "  return (",
+      "    <div>",
+      "      <div />",
+      "    </div>",
+      "  );",
+      "};",
+      "",
+      "export default ${TM_FILENAME_BASE}$1;",
+      ""
+    ]
+  },
+
+  "StyleSheet": {
+    "scope": "scss,sass",
+    "prefix": "crStyleSheet",
+    "description": "Create StyleSheet",
+    "body": ["@import '../../styles/index';", "", "$1", ""]
+  }
+}
