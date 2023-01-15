@@ -4,7 +4,7 @@
     "prefix": "crFC",
     "description": "Create a empty function component",
     "body": [
-      "const ${TM_FILENAME_BASE}$1: React.$2FC = (props) => {",
+      "const ${TM_FILENAME_BASE}$1: React.FC$2 = (props) => {",
       "  const {$3} = props;",
       "",
       "  return (",
@@ -28,7 +28,7 @@
       "",
       "import './styles.scss';",
       "",
-      "const ${TM_FILENAME_BASE}$1: React.$2FC = (props) => {",
+      "const ${TM_FILENAME_BASE}$1: React.FC$2 = (props) => {",
       "  const {$3} = props;",
       "",
       "  return (",
