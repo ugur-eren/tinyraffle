@@ -8,7 +8,7 @@ const Landing: React.FC = () => {
     <div className="p-landing">
       <div className="p-landing__content w-limited">
         <div className="p-landing__left">
-          <StepCard index={1} title="Login With Sol Wallet">
+          <StepCard index={1} title="Login With Sol Wallet" flexStructure={[2, 1]}>
             <FormElement>
               <FormElement.Button>Connect</FormElement.Button>
             </FormElement>
@@ -18,6 +18,7 @@ const Landing: React.FC = () => {
             index={2}
             title="Upload Your List (CSV Format)"
             description="Enter How Many lines in the raffle?"
+            flexStructure={[2, 1]}
           >
             <FormElement>
               <button type="button">Upload</button>
@@ -28,7 +29,7 @@ const Landing: React.FC = () => {
             </FormElement>
           </StepCard>
 
-          <StepCard index={3} title="See the Winner">
+          <StepCard index={3} title="See the Winner" flexStructure={[1, 1]}>
             <FormElement>
               <button type="button">Show Winner</button>
             </FormElement>
