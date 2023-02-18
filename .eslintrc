@@ -23,6 +23,7 @@
 
   "plugins": [
     "react",
+    "react-hooks",
     "@typescript-eslint",
     "import",
     "jsx-a11y",
@@ -32,6 +33,8 @@
   ],
 
   "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
     "import/prefer-default-export": 0,
     "react/jsx-filename-extension": [2, {"extensions": [".js", ".jsx", ".ts", ".tsx"]}],
     "react/jsx-props-no-spreading": 0,
