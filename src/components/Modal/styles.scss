@@ -1,0 +1,25 @@
+@use 'sass:color';
+
+@import '../../styles';
+
+.c-modal {
+  /* stylelint-disable-next-line scale-unlimited/declaration-strict-value */
+  z-index: 1000;
+  background-color: color.adjust($g-colors-black, $alpha: -0.5);
+
+  &__container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__content {
+    width: 100%;
+    max-width: 70%;
+    max-height: 85%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
