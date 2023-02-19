@@ -31,7 +31,7 @@ const Landing: React.FC = () => {
             </FormElement>
 
             <FormElement>
-              <FormElement.Input type="text" />
+              <input type="text" placeholder="_ _ _ _" />
             </FormElement>
           </StepCard>
 

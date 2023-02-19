@@ -1,7 +1,5 @@
 import {forwardRef} from 'react';
 import cx from 'classnames';
-import Button from './Button';
-import Input from './Input';
 
 import './styles.scss';
 
@@ -19,4 +17,4 @@ const FormElement = forwardRef<HTMLDivElement, FormElementProps>((props, ref) =>
   );
 });
 
-export default Object.assign(FormElement, {Button, Input});
+export default FormElement;
