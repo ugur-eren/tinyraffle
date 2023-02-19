@@ -2,20 +2,28 @@ import cx from 'classnames';
 
 import './styles.scss';
 
-export interface StepCardProps {
+export type StepCardProps = JSX.IntrinsicElements['div'] & {
   children?: React.ReactNode;
   className?: string;
   index: number;
   title: string;
   description?: string;
   flexStructure?: [number, number];
-}
+};
 
 const StepCard: React.FC<StepCardProps> = (props) => {
-  const {children, className, index, title, description, flexStructure = [1, 0]} = props;
+  const {
+    children,
+    className,
+    index,
+    title,
+    description,
+    flexStructure = [1, 0],
+    ...restProps
+  } = props;
 
   return (
-    <div className={cx('c-step-card', className)}>
+    <div className={cx('c-step-card', className)} {...restProps}>
       <div className="c-step-card__border" />
 
       <div className="c-step-card__content">

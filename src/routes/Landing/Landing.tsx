@@ -1,3 +1,4 @@
+import {WalletMultiButton} from '@solana/wallet-adapter-react-ui';
 import StepCard from './StepCard/StepCard';
 import {FormElement} from '../../components';
 
@@ -8,9 +9,14 @@ const Landing: React.FC = () => {
     <div className="p-landing">
       <div className="p-landing__content w-limited">
         <div className="p-landing__left">
-          <StepCard index={1} title="Login With Sol Wallet" flexStructure={[2, 1]}>
+          <StepCard
+            index={1}
+            title="Login With Sol Wallet"
+            style={{zIndex: 1}}
+            flexStructure={[1, 1]}
+          >
             <FormElement>
-              <FormElement.Button>Connect</FormElement.Button>
+              <WalletMultiButton />
             </FormElement>
           </StepCard>
 

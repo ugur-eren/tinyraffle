@@ -6,6 +6,7 @@
   @include margin-vertical(spacing(xsmall));
 
   position: relative;
+  z-index: 0;
   display: flex;
   padding: rem(2px);
   border-radius: $l-border-radius;

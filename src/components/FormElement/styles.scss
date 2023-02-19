@@ -24,7 +24,11 @@
   input {
     @extend %btn-clean;
 
+    display: flex;
+    height: auto;
     flex: 1;
+    align-items: center;
+    justify-content: center;
     padding: spacing(normal) spacing(xxlarge) spacing(xsmall);
     background: linear-gradient(270deg, #2f5d95 0%, #5264d7 100%);
     border-radius: $l-border-radius - rem(1px);
@@ -33,6 +37,8 @@
     color: $g-colors-text-light;
     font-family: $g-font-family-head;
     font-size: rem(32px);
+    font-weight: inherit;
+    line-height: normal;
   }
 
   input {
