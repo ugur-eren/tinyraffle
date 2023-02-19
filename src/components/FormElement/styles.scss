@@ -21,7 +21,9 @@
   }
 
   button,
-  input {
+  .button,
+  input,
+  .input {
     @extend %btn-clean;
 
     display: flex;
@@ -41,7 +43,8 @@
     line-height: normal;
   }
 
-  input {
+  input,
+  .input {
     width: 100%;
     background: linear-gradient(270deg, #242949 0%, #0b0c11 100%);
     cursor: text;

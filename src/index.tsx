@@ -7,6 +7,7 @@ import App from './App';
 import 'bootstrap/scss/bootstrap-grid.scss';
 import '@csstools/normalize.css';
 import '@solana/wallet-adapter-react-ui/styles.css';
+import 'react-toastify/dist/ReactToastify.css';
 import './styles/all.scss';
 import './index.scss';
 

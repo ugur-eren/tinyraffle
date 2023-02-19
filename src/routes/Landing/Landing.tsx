@@ -1,17 +1,61 @@
+import {useState} from 'react';
+import {toast} from 'react-toastify';
 import {WalletMultiButton} from '@solana/wallet-adapter-react-ui';
 import StepCard from './StepCard/StepCard';
-import {FormElement} from '../../components';
+import {FormElement, PseudoButton} from '../../components';
 
 import './styles.scss';
 
 const Landing: React.FC = () => {
+  const [participants, setParticipants] = useState<string[]>([]);
+
+  const onParticipantsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.item(0);
+
+    if (!selectedFile) {
+      toast.error('No file selected!');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsText(selectedFile, 'UTF-8');
+
+    reader.onload = (e) => {
+      const result = e.target?.result;
+
+      if (!result || typeof result !== 'string') {
+        toast.error('Selected file is not a text file!');
+        return;
+      }
+
+      const entries = result.replaceAll('\r', '').split('\n');
+
+      if (entries.length < 1) {
+        toast.error('There are no participant entries in the file!');
+        return;
+      }
+
+      if (entries.length === 1) {
+        toast.error('There is only one participant entry in the file!');
+        return;
+      }
+
+      setParticipants(entries);
+    };
+
+    reader.onerror = (e) => {
+      toast.error('Error while reading the file!');
+      console.error(e);
+    };
+  };
+
   return (
     <div className="p-landing">
       <div className="p-landing__content w-limited w-100">
         <div className="p-landing__left">
           <StepCard
             index={1}
-            title="Login With Sol Wallet"
+            title="Login With Your Wallet"
             style={{zIndex: 1}}
             flexStructure={[1, 1]}
           >
@@ -27,7 +71,11 @@ const Landing: React.FC = () => {
             flexStructure={[2, 1]}
           >
             <FormElement>
-              <button type="button">Upload</button>
+              <label className="d-flex w-100">
+                <input type="file" onChange={onParticipantsChange} className="hidden" />
+
+                <PseudoButton className="button">Upload</PseudoButton>
+              </label>
             </FormElement>
           </StepCard>
 

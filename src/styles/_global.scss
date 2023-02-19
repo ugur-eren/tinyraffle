@@ -249,6 +249,8 @@
   overflow-y: visible;
 }
 
+// General
+
 .img-fluid {
   max-width: 100%;
   height: auto;
@@ -257,6 +259,18 @@
 .btn-clean {
   @extend %btn-clean;
 }
+
+/* stylelint-disable declaration-no-important */
+.hidden {
+  position: absolute !important;
+  top: -9999rem !important;
+  left: -9999rem !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+/* stylelint-enable declaration-no-important */
 
 // Fill
 
