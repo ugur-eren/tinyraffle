@@ -1,10 +1,9 @@
-import cx from 'classnames';
+import {Card} from '../../../components';
 
 import './styles.scss';
 
 export type StepCardProps = JSX.IntrinsicElements['div'] & {
   children?: React.ReactNode;
-  className?: string;
   index: number;
   title: string;
   description?: string;
@@ -12,33 +11,21 @@ export type StepCardProps = JSX.IntrinsicElements['div'] & {
 };
 
 const StepCard: React.FC<StepCardProps> = (props) => {
-  const {
-    children,
-    className,
-    index,
-    title,
-    description,
-    flexStructure = [1, 0],
-    ...restProps
-  } = props;
+  const {children, index, title, description, flexStructure = [1, 0], ...restProps} = props;
 
   return (
-    <div className={cx('c-step-card', className)} {...restProps}>
-      <div className="c-step-card__border" />
+    <Card contentProps={{className: 'f-dir-row'}} {...restProps}>
+      <div className="c-step-card__left" style={{flex: flexStructure[0]}}>
+        <span>{index}.</span>
+        <h4>{title}</h4>
 
-      <div className="c-step-card__content">
-        <div className="c-step-card__content__left" style={{flex: flexStructure[0]}}>
-          <span>{index}.</span>
-          <h4>{title}</h4>
-
-          <p>{description}</p>
-        </div>
-
-        <div className="c-step-card__content__right" style={{flex: flexStructure[1]}}>
-          {children}
-        </div>
+        <p>{description}</p>
       </div>
-    </div>
+
+      <div className="c-step-card__right" style={{flex: flexStructure[1]}}>
+        {children}
+      </div>
+    </Card>
   );
 };
 
