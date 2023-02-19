@@ -7,7 +7,7 @@ import './styles.scss';
 const Landing: React.FC = () => {
   return (
     <div className="p-landing">
-      <div className="p-landing__content w-limited">
+      <div className="p-landing__content w-limited w-100">
         <div className="p-landing__left">
           <StepCard
             index={1}
@@ -22,16 +22,12 @@ const Landing: React.FC = () => {
 
           <StepCard
             index={2}
-            title="Upload Your List (CSV Format)"
-            description="Enter How Many lines in the raffle?"
+            title="Upload Your List (TXT Format)"
+            description="Every new line is evaluated as a participant"
             flexStructure={[2, 1]}
           >
             <FormElement>
               <button type="button">Upload</button>
-            </FormElement>
-
-            <FormElement>
-              <input type="text" placeholder="_ _ _ _" />
             </FormElement>
           </StepCard>
 
