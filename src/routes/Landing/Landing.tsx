@@ -2,11 +2,13 @@ import {useState} from 'react';
 import {toast} from 'react-toastify';
 import {WalletMultiButton} from '@solana/wallet-adapter-react-ui';
 import StepCard from './StepCard/StepCard';
-import {FormElement, PseudoButton} from '../../components';
+import ParticipantsModal from './ParticipantsModal/ParticipantsModal';
+import {Card, FormElement, Modal, PseudoButton} from '../../components';
 
 import './styles.scss';
 
 const Landing: React.FC = () => {
+  const [participantModalShown, setParticipantModalShown] = useState(false);
   const [participants, setParticipants] = useState<string[]>([]);
 
   const onParticipantsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,6 +43,7 @@ const Landing: React.FC = () => {
       }
 
       setParticipants(entries);
+      setParticipantModalShown(true);
     };
 
     reader.onerror = (e) => {
@@ -104,6 +107,14 @@ const Landing: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <Modal shown={participantModalShown}>
+        <ParticipantsModal
+          closeModal={() => setParticipantModalShown(false)}
+          participants={participants}
+          clearParticipants={() => setParticipants([])}
+        />
+      </Modal>
     </div>
   );
 };

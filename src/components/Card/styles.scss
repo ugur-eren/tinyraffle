@@ -30,6 +30,7 @@
     align-items: center;
     padding: spacing(large);
     padding-left: spacing(xxlarge);
+    overflow-y: auto;
     background: linear-gradient(270deg, #171c41 0%, #0b0c11 100%);
     border-radius: $l-border-radius - rem(1px);
     box-shadow: rem(8px) rem(-1px) rem(10px) rem(2px) rgba(59, 77, 235, 0.5) inset,

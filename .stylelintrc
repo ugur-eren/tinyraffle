@@ -107,7 +107,6 @@
         "bottom",
         "left",
         "display",
-        "overflow",
         "width",
         "min-width",
         "max-width",
@@ -160,7 +159,10 @@
         "margin-top",
         "margin-right",
         "margin-bottom",
-        "margin-left"
+        "margin-left",
+        "overflow",
+        "overflow-x",
+        "overflow-y"
       ],
       {
         "unspecified": "bottomAlphabetical"

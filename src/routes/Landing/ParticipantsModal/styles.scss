@@ -1,0 +1,20 @@
+@import '../../../styles';
+
+.c-participants-modal {
+  ul {
+    padding: 0;
+    column-count: auto;
+    column-fill: balance;
+    list-style: none;
+
+    li {
+      padding: rem(6px);
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    gap: rem(12px);
+    flex-direction: row;
+  }
+}
