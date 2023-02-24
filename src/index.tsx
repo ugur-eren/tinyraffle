@@ -1,3 +1,13 @@
+/* eslint import/order: "off" */
+/* eslint @typescript-eslint/no-var-requires: "off" */
+/* eslint import/no-extraneous-dependencies: "off" */
+/* eslint prefer-destructuring: "off" */
+/* eslint import/first: "off" */
+
+const Buffer = require('buffer/').Buffer;
+
+window.Buffer = Buffer;
+
 import {StrictMode} from 'react';
 import ReactDOM from 'react-dom/client';
 import {BrowserRouter} from 'react-router-dom';
