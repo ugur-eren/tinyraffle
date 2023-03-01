@@ -31,7 +31,9 @@ const ParticipantsModal: React.FC<ParticipantsModalProps> = (props) => {
 
       <div className="c-participants-modal__buttons">
         <FormElement>
-          <button type="button">Looks Good</button>
+          <button type="button" onClick={closeModal}>
+            Looks Good
+          </button>
         </FormElement>
 
         <FormElement>
