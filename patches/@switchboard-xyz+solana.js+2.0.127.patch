@@ -1,0 +1,37 @@
+diff --git a/node_modules/@switchboard-xyz/solana.js/lib/esm/test/SolanaDockerOracle.js b/node_modules/@switchboard-xyz/solana.js/lib/esm/test/SolanaDockerOracle.js
+index 7e36a80..2dcce97 100644
+--- a/node_modules/@switchboard-xyz/solana.js/lib/esm/test/SolanaDockerOracle.js
++++ b/node_modules/@switchboard-xyz/solana.js/lib/esm/test/SolanaDockerOracle.js
+@@ -1,11 +1,6 @@
+-import { DockerOracle } from '@switchboard-xyz/common';
+ import path from 'path';
+-export class SolanaDockerOracle extends DockerOracle {
++export class SolanaDockerOracle {
+     constructor(nodeImage, config, switchboardDirectory = path.join(process.cwd(), '.switchboard'), silent = false) {
+-        super(nodeImage, {
+-            ...config,
+-            chain: 'solana',
+-        }, switchboardDirectory, silent);
+         this.nodeImage = nodeImage;
+         this.switchboardDirectory = switchboardDirectory;
+         this.silent = silent;
+diff --git a/node_modules/@switchboard-xyz/solana.js/lib/esm/test/SwitchboardTestContextV2.js b/node_modules/@switchboard-xyz/solana.js/lib/esm/test/SwitchboardTestContextV2.js
+index 327b8c4..792eaa3 100644
+--- a/node_modules/@switchboard-xyz/solana.js/lib/esm/test/SwitchboardTestContextV2.js
++++ b/node_modules/@switchboard-xyz/solana.js/lib/esm/test/SwitchboardTestContextV2.js
+@@ -1,5 +1,4 @@
+ import { Keypair } from '@solana/web3.js';
+-import { DockerOracle } from '@switchboard-xyz/common';
+ import fs from 'fs';
+ import _ from 'lodash';
+ import os from 'os';
+@@ -159,9 +158,7 @@ export class SwitchboardTestContextV2 {
+                 DISABLE_NONE_QUEUE: true,
+             },
+         }, dockerParams);
+-        this.dockerOracle = new DockerOracle(nodeImage, { ...config, chain: 'solana' }, undefined, silent);
+         console.log(`Starting Switchboard oracle ...`);
+-        await this.dockerOracle.startAndAwait(timeout);
+     }
+     stop() {
+         if (this.dockerOracle) {

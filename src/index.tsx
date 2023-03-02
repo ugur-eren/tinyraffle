@@ -4,9 +4,24 @@
 /* eslint prefer-destructuring: "off" */
 /* eslint import/first: "off" */
 
-const Buffer = require('buffer/').Buffer;
+window.Buffer = require('buffer/').Buffer;
 
-window.Buffer = Buffer;
+const oldTimeout = window.setTimeout;
+
+const newTimeout: any = (...args: any[]) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  oldTimeout(...args);
+
+  const timeoutReturn = {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    unref: () => {},
+  };
+
+  return timeoutReturn;
+};
+
+if (oldTimeout !== newTimeout) window.setTimeout = newTimeout;
 
 import {StrictMode} from 'react';
 import ReactDOM from 'react-dom/client';
