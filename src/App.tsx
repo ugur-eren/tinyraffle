@@ -9,6 +9,7 @@ import {
 import {TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import {useConnection, useAnchorWallet, useWallet} from '@solana/wallet-adapter-react';
 import {
+  clusterApiUrl,
   Keypair,
   PublicKey,
   SystemProgram,
@@ -21,6 +22,7 @@ import {
   VrfAccount,
   PermissionAccount,
   NativeMint,
+  TransactionObject,
 } from '@switchboard-xyz/solana.js';
 import {useEffect} from 'react';
 import {VRFClientIDL} from './contracts';
@@ -44,33 +46,38 @@ const App: React.FC = () => {
       });
 
       const program = new Program(VRFClientIDL, programId, provider);
+
       const vrfSecret = web3.Keypair.generate();
+      console.log(`VRF Account: ${vrfSecret.publicKey}`);
 
       const [vrfClientKey] = utils.publicKey.findProgramAddressSync(
         [Buffer.from('CLIENTSEED'), vrfSecret.publicKey.toBytes()],
         program.programId,
       );
-
       console.log(`VRF Client: ${vrfClientKey}`);
 
       // SWITCHBOARD
 
-      const switchboard: SwitchboardProgram = await SwitchboardProgram.load('devnet', connection);
+      const switchboard = await SwitchboardProgram.load('devnet', connection);
 
-      const [queueAccount, txnSignature] = await QueueAccount.load(
+      const [queueAccount, oracleQueueAccountData] = await QueueAccount.load(
         switchboard,
         'F8ce7MsckeZAbAGmxjJNetxYXQa9mKr9nnrC3qKubyYy',
       );
 
-      console.log(`Transaction signature of queue Account`, txnSignature);
+      console.log('queueAccount', queueAccount);
+      console.log('oracleQueueAccountData', oracleQueueAccountData);
 
-      let isReady = false;
-      while (!isReady) {
-        // eslint-disable-next-line no-await-in-loop
-        isReady = await queueAccount.isReady();
-      }
+      await new Promise((resolve) => {
+        (function wait() {
+          queueAccount.isReady().then((isReady) => {
+            if (isReady) resolve(true);
+            else wait();
+          });
+        })();
+      });
 
-      const [vrfAccount, txObject] = await VrfAccount.createInstructions(
+      const [vrfAccount, vrfAccountTxObject] = await VrfAccount.createInstructions(
         switchboard,
         provider.wallet.publicKey,
         {
@@ -88,21 +95,19 @@ const App: React.FC = () => {
         },
       );
 
-      const latestBlock = await connection.getLatestBlockhash();
-
-      const vrfTx = txObject.toTxn({
-        blockhash: latestBlock.blockhash,
-        lastValidBlockHeight: latestBlock.lastValidBlockHeight,
-      });
-
-      vrfTx.sign(vrfSecret);
-      const vrfTxSent = await sendTransaction(vrfTx, connection);
-
-      console.log('vrfTxSent', vrfTxSent);
+      console.log(
+        'vrfAccountTx',
+        await sendTransaction(
+          vrfAccountTxObject.sign(await connection.getLatestBlockhash(), [vrfSecret]),
+          connection,
+        ),
+      );
 
       console.log(`Created VRF Account: ${vrfAccount.publicKey}`);
 
-      const txData = await program.methods
+      // Create VRF Client account
+      // INIT CLIENT
+      const initClientTx = await program.methods
         .initClient({
           maxResult: new BN(1337),
         })
@@ -114,21 +119,23 @@ const App: React.FC = () => {
         })
         .transaction();
 
-      console.log('txData', txData);
+      console.log('initClientTx', await sendTransaction(initClientTx, connection));
 
-      const tx = await sendTransaction(txData, connection);
+      console.log('Created VrfClient Account:', vrfClientKey.toString());
 
-      console.log('tx', tx);
+      console.log('Now requestin randomness sectionnnnnn hadi!!!');
 
       // REQUEST RANDOMNESSSSSSSSSSSSSSSSSSSSSSSSSSSS
+
       const queue = await queueAccount.loadData();
       const vrf = await vrfAccount.loadData();
-      console.log(`WTF is vrf ${vrf}`);
+
+      console.log(`WTF is vrf`, vrf);
 
       // derive the existing VRF permission account using the seeds
       console.log('permission is coming');
 
-      const [permissionAccount, permissionTxObject] = PermissionAccount.createInstruction(
+      const [permissionAccount, permissionAccountTxObject] = PermissionAccount.createInstruction(
         switchboard,
         provider.wallet.publicKey,
         {
@@ -138,16 +145,13 @@ const App: React.FC = () => {
         },
       );
 
-      const newLatestBlock = await connection.getLatestBlockhash();
-
-      const permissionTx = permissionTxObject.toTxn({
-        blockhash: newLatestBlock.blockhash,
-        lastValidBlockHeight: newLatestBlock.lastValidBlockHeight,
-      });
-
-      const permissionTxSent = await sendTransaction(permissionTx, connection);
-
-      console.log('permissionTxSent', permissionTxSent);
+      console.log(
+        'permissionAccountTx',
+        await sendTransaction(
+          permissionAccountTxObject.toTxn(await connection.getLatestBlockhash()),
+          connection,
+        ),
+      );
 
       const [cumac, permissionBump] = PermissionAccount.fromSeed(
         switchboard,
@@ -158,7 +162,6 @@ const App: React.FC = () => {
 
       console.log(
         `permisson is done +++ payer token wallet is coming: ${permissionAccount.publicKey}`,
-        switchboard.walletPubkey,
       );
 
       const Mint = await NativeMint.load(provider);
@@ -175,7 +178,7 @@ const App: React.FC = () => {
       const vrfAccounts = await vrfAccount.fetchAccounts();
 
       // Request randomness
-      await program.methods
+      const requestRandomnessTx = await program.methods
         .requestRandomness({
           switchboardStateBump: switchboard.programState.bump,
           permissionBump,
@@ -192,14 +195,16 @@ const App: React.FC = () => {
           switchboardProgram: switchboard.programId,
           payerWallet: payerTokenWallet,
           payerAuthority: provider.wallet.publicKey,
-          recentBlockhashes: SYSVAR_RECENT_BLOCKHASHES_PUBKEY,
-          tokenProgram: TOKEN_PROGRAM_ID,
+          recentBlockhashes: web3.SYSVAR_RECENT_BLOCKHASHES_PUBKEY,
+          tokenProgram: utils.token.TOKEN_PROGRAM_ID,
         })
-        .rpc();
+        .transaction();
+
+      console.log('requestRandomnessTx', await sendTransaction(requestRandomnessTx, connection));
 
       console.log('Requested RANDOMNES!');
 
-      const result = await vrfAccount.nextResult(new BN(vrf.counter.toNumber() + 1), 45_000);
+      const result = await vrfAccount.nextResult(new BN(vrf.counter.toNumber() + 1), 180_000);
 
       console.log(result);
 
@@ -212,16 +217,12 @@ const App: React.FC = () => {
       console.log(vrfClientState);
 
       console.log(`Vrf client state??? ${vrfClientState}`);
-      console.log(
-        `Max result`,
-        vrfClientState.maxResult,
-        (vrfClientState.maxResult as any).toString(10),
-      );
-      console.log(
-        `random number`,
-        vrfClientState.result,
-        (vrfClientState.result as any).toString(10),
-      );
+      console.log(`Max result: ${(vrfClientState.maxResult as any).toString(10)}`);
+      console.log(`Max result: ${(vrfClientState.maxResult as any).toString(10)}`);
+      console.log(`random number: ${(vrfClientState.result as any).toString(10)}`);
+
+      const callbackTxnMeta = await vrfAccount.getCallbackTransactions();
+      console.log(callbackTxnMeta);
     })();
   });
 
