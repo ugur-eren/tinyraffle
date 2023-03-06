@@ -24,8 +24,10 @@ const ParticipantsModal: React.FC<ParticipantsModalProps> = (props) => {
       ) : null}
 
       <ul>
-        {participants.map((participant) => (
-          <li key={participant}>{participant}</li>
+        {participants.map((participant, index) => (
+          <li key={participant}>
+            {index + 1} - {participant}
+          </li>
         ))}
       </ul>
 

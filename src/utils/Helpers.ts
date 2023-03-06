@@ -34,3 +34,23 @@ export const parseLanguageParts = (language: string, parts: Record<string, strin
     return current.replaceAll(`%${key}%`, parts[key]);
   }, language);
 };
+
+export const waitUntil = <T>(
+  promise: Promise<T>,
+  condition: (value: T) => boolean,
+): Promise<void> => {
+  return new Promise((resolve) => {
+    promise.then((isReady) => {
+      if (isReady) resolve();
+      else waitUntil(promise, condition).then(resolve);
+    });
+  });
+};
+
+export const autoEllipsis = (text: string, maxLength: number): string => {
+  if (text.length <= maxLength) return text;
+
+  const splitAt = Math.floor(maxLength / 2);
+
+  return `${text.slice(0, splitAt)}...${text.slice(-splitAt)}`;
+};

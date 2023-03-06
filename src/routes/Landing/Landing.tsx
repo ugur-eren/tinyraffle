@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {toast} from 'react-toastify';
 import {WalletMultiButton} from '@solana/wallet-adapter-react-ui';
-import {useConnection, useWallet} from '@solana/wallet-adapter-react';
+import {useAnchorWallet, useConnection, useWallet} from '@solana/wallet-adapter-react';
 import {
   MINT_SIZE,
   TOKEN_PROGRAM_ID,
@@ -17,18 +17,38 @@ import {
 } from '@metaplex-foundation/mpl-token-metadata';
 import {findMetadataPda} from '@metaplex-foundation/js';
 import {Keypair, SystemProgram, Transaction} from '@solana/web3.js';
+import {
+  Program,
+  AnchorProvider,
+  web3,
+  BN,
+  utils,
+  BorshInstructionCoder,
+} from '@project-serum/anchor';
+import {
+  SwitchboardProgram,
+  QueueAccount,
+  VrfAccount,
+  PermissionAccount,
+  NativeMint,
+} from '@switchboard-xyz/solana.js';
 import StepCard from './StepCard/StepCard';
 import ParticipantsModal from './ParticipantsModal/ParticipantsModal';
 import {FormElement, Modal, PseudoButton} from '../../components';
+import {VRFClientIDL} from '../../contracts';
+import {VRF_PROGRAM_ID} from '../../utils/Constants';
 
 import './styles.scss';
+import {autoEllipsis, waitUntil} from '../../utils/Helpers';
 
 const Landing: React.FC = () => {
   const [participantModalShown, setParticipantModalShown] = useState(false);
   const [participants, setParticipants] = useState<string[]>([]);
+  const [winnerIndex, setWinnerIndex] = useState<number>(-1);
 
   const {connection} = useConnection();
-  const wallet = useWallet();
+  const {sendTransaction, signTransaction} = useWallet();
+  const wallet = useAnchorWallet();
 
   const onParticipantsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.item(0);
@@ -72,7 +92,7 @@ const Landing: React.FC = () => {
   };
 
   const onShowWinnerPress = async () => {
-    if (!wallet.publicKey || !wallet.sendTransaction) return;
+    if (!wallet || !sendTransaction || !signTransaction) return;
 
     const tokenMetadata: DataV2 = {
       name: 'Raffle',
@@ -128,13 +148,141 @@ const Landing: React.FC = () => {
       ),
     );
 
-    await wallet.sendTransaction(createNewTokenTransaction, connection, {signers: [mintKeypair]});
+    await sendTransaction(createNewTokenTransaction, connection, {signers: [mintKeypair]});
 
     console.log('Token created!', {
       token: mintKeypair.publicKey.toBase58(),
       tokenAccount: tokenATA.toBase58(),
       metadata: tokenMetadata,
     });
+
+    // VRF
+
+    const provider = new AnchorProvider(connection, wallet, {
+      commitment: 'processed',
+    });
+
+    const program = new Program(VRFClientIDL, VRF_PROGRAM_ID, provider);
+
+    const switchboard = await SwitchboardProgram.load('devnet', connection);
+
+    const vrfSecret = web3.Keypair.generate();
+    const [vrfClientKey] = utils.publicKey.findProgramAddressSync(
+      [Buffer.from('CLIENTSEED'), vrfSecret.publicKey.toBytes()],
+      program.programId,
+    );
+
+    const [queueAccount] = await QueueAccount.load(
+      switchboard,
+      'F8ce7MsckeZAbAGmxjJNetxYXQa9mKr9nnrC3qKubyYy',
+    );
+
+    await waitUntil(queueAccount.isReady(), (isReady) => isReady);
+
+    const [vrfAccount, vrfAccountTxObject] = await VrfAccount.createInstructions(
+      switchboard,
+      provider.wallet.publicKey,
+      {
+        vrfKeypair: vrfSecret,
+        authority: vrfClientKey,
+        queueAccount,
+        callback: {
+          programId: program.programId,
+          accounts: [
+            {pubkey: vrfClientKey, isSigner: false, isWritable: true},
+            {pubkey: vrfSecret.publicKey, isSigner: false, isWritable: false},
+          ],
+          ixData: new BorshInstructionCoder(program.idl).encode('consumeRandomness', ''),
+        },
+      },
+    );
+
+    await sendTransaction(
+      vrfAccountTxObject.sign(await connection.getLatestBlockhash(), [vrfSecret]),
+      connection,
+    );
+
+    const initClientTx = await program.methods
+      .initClient({
+        maxResult: new BN(participants.length),
+      })
+      .accounts({
+        state: vrfClientKey,
+        vrf: vrfAccount.publicKey,
+        payer: provider.wallet.publicKey,
+        systemProgram: web3.SystemProgram.programId,
+      })
+      .transaction();
+
+    await sendTransaction(initClientTx, connection);
+
+    const queue = await queueAccount.loadData();
+    const vrf = await vrfAccount.loadData();
+
+    const [permissionAccount, permissionAccountTxObject] = PermissionAccount.createInstruction(
+      switchboard,
+      provider.wallet.publicKey,
+      {
+        granter: queueAccount.publicKey,
+        grantee: vrfAccount.publicKey,
+        authority: queue.authority,
+      },
+    );
+
+    await sendTransaction(
+      permissionAccountTxObject.toTxn(await connection.getLatestBlockhash()),
+      connection,
+    );
+
+    const [, permissionBump] = PermissionAccount.fromSeed(
+      switchboard,
+      queue.authority,
+      queueAccount.publicKey,
+      vrfAccount.publicKey,
+    );
+
+    const Mint = await NativeMint.load(provider);
+
+    const [payerTokenWallet] = await Mint.getOrCreateWrappedUser(provider.wallet.publicKey, {
+      fundUpTo: 0.002,
+    });
+
+    const requestRandomnessTx = await program.methods
+      .requestRandomness({
+        switchboardStateBump: switchboard.programState.bump,
+        permissionBump,
+        raffleAddress: mintKeypair.publicKey,
+      })
+      .accounts({
+        state: vrfClientKey,
+        vrf: vrfAccount.publicKey,
+        oracleQueue: 'F8ce7MsckeZAbAGmxjJNetxYXQa9mKr9nnrC3qKubyYy',
+        queueAuthority: '2KgowxogBrGqRcgXQEmqFvC3PGtCu66qERNJevYW8Ajh',
+        dataBuffer: '7yJ3sSifpmUFB5BcXy6yMDje15xw2CovJjfXfBKsCfT5',
+        permission: permissionAccount.publicKey,
+        escrow: vrf.escrow,
+        programState: switchboard.programState.publicKey,
+        switchboardProgram: switchboard.programId,
+        payerWallet: payerTokenWallet,
+        payerAuthority: provider.wallet.publicKey,
+        recentBlockhashes: web3.SYSVAR_RECENT_BLOCKHASHES_PUBKEY,
+        tokenProgram: utils.token.TOKEN_PROGRAM_ID,
+      })
+      .transaction();
+
+    await sendTransaction(requestRandomnessTx, connection);
+
+    const result = await vrfAccount.nextResult(new BN(vrf.counter.toNumber() + 1), 90_000);
+
+    if (!result.success) {
+      throw new Error(`Failed to get VRF Result: ${result.status}`);
+    }
+
+    const vrfClientState: any = await program.account.vrfClientState.fetch(vrfClientKey);
+
+    const vrfResult = vrfClientState?.result?.toString?.(10);
+
+    setWinnerIndex((parseInt(vrfResult, 10) || 0) - 1);
   };
 
   return (
@@ -186,7 +334,13 @@ const Landing: React.FC = () => {
 
           <div className="p-landing__right__result">
             <h3 className="p-landing__right__result__title">RESULT:</h3>
-            <span className="p-landing__right__result__description">####</span>
+            {winnerIndex === -1 ? (
+              <span className="p-landing__right__result__description">####</span>
+            ) : (
+              <span className="p-landing__right__result__description">
+                {winnerIndex + 1} - {autoEllipsis(participants[winnerIndex], 14)}
+              </span>
+            )}
 
             <a href="#proof" className="p-landing__right__result__proof-link">
               CLICK FOR PROOF

@@ -1,0 +1,8 @@
+module.exports = {
+  exec: () => {
+    // ...
+  },
+  execSync: () => {
+    // ...
+  },
+};
