@@ -45,6 +45,7 @@ const Landing: React.FC = () => {
   const [participantModalShown, setParticipantModalShown] = useState(false);
   const [participants, setParticipants] = useState<string[]>([]);
   const [winnerIndex, setWinnerIndex] = useState<number>(-1);
+  const [winnerTx, setWinnerTx] = useState('');
 
   const {connection} = useConnection();
   const {sendTransaction, signTransaction} = useWallet();
@@ -272,15 +273,15 @@ const Landing: React.FC = () => {
 
     await sendTransaction(requestRandomnessTx, connection);
 
-    const result = await vrfAccount.nextResult(new BN(vrf.counter.toNumber() + 1), 90_000);
+    const [event, , signature] = await new Promise<[any, number, string]>((resolve) => {
+      program.addEventListener('VrfClientUpdated', (...args) => {
+        resolve(args);
+      });
+    });
 
-    if (!result.success) {
-      throw new Error(`Failed to get VRF Result: ${result.status}`);
-    }
+    setWinnerTx(signature);
 
-    const vrfClientState: any = await program.account.vrfClientState.fetch(vrfClientKey);
-
-    const vrfResult = vrfClientState?.result?.toString?.(10);
+    const vrfResult = event?.result?.toString?.(10);
 
     setWinnerIndex((parseInt(vrfResult, 10) || 0) - 1);
   };
@@ -342,9 +343,16 @@ const Landing: React.FC = () => {
               </span>
             )}
 
-            <a href="#proof" className="p-landing__right__result__proof-link">
-              CLICK FOR PROOF
-            </a>
+            {winnerTx ? (
+              <a
+                href={`https://explorer.solana.com/tx/${winnerTx}?cluster=devnet`}
+                target="_blank"
+                rel="noreferrer"
+                className="p-landing__right__result__proof-link"
+              >
+                CLICK FOR PROOF
+              </a>
+            ) : null}
           </div>
         </div>
       </div>
