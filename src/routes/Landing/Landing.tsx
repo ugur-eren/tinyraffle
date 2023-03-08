@@ -15,7 +15,7 @@ import {
   DataV2,
   createCreateMetadataAccountV2Instruction,
 } from '@metaplex-foundation/mpl-token-metadata';
-import {findMetadataPda} from '@metaplex-foundation/js';
+import {bundlrStorage, Metaplex, walletAdapterIdentity} from '@metaplex-foundation/js';
 import {Keypair, SystemProgram, Transaction} from '@solana/web3.js';
 import {
   Program,
@@ -48,7 +48,8 @@ const Landing: React.FC = () => {
   const [winnerTx, setWinnerTx] = useState('');
 
   const {connection} = useConnection();
-  const {sendTransaction, signTransaction} = useWallet();
+  const solWallet = useWallet();
+  const {sendTransaction, signTransaction} = solWallet;
   const wallet = useAnchorWallet();
 
   const onParticipantsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,10 +96,34 @@ const Landing: React.FC = () => {
   const onShowWinnerPress = async () => {
     if (!wallet || !sendTransaction || !signTransaction) return;
 
-    const tokenMetadata: DataV2 = {
+    const metaplex = new Metaplex(connection, {cluster: 'devnet'})
+      .use(walletAdapterIdentity(solWallet))
+      .use(
+        bundlrStorage({
+          address: 'https://devnet.bundlr.network',
+          providerUrl: 'https://api.devnet.solana.com',
+        }),
+      );
+
+    const tokenMetaData = {
       name: 'Raffle',
       symbol: 'Raffle',
-      uri: 'https://google.com/',
+      description: 'Raffle',
+
+      // TODO: Add image
+      image: 'http://via.placeholder.com/350x150',
+
+      properties: {
+        participants,
+      },
+    };
+
+    const tokenMetaDataOutput = await metaplex.nfts().uploadMetadata(tokenMetaData);
+
+    const tokenData: DataV2 = {
+      name: 'Raffle',
+      symbol: 'Raffle',
+      uri: tokenMetaDataOutput.uri,
       sellerFeeBasisPoints: 0,
       creators: null,
       collection: null,
@@ -106,8 +131,10 @@ const Landing: React.FC = () => {
     };
 
     const lamports = await getMinimumBalanceForRentExemptMint(connection);
+
     const mintKeypair = Keypair.generate();
-    const metadataPDA = findMetadataPda(mintKeypair.publicKey);
+    const metadataPDA = metaplex.nfts().pdas().metadata({mint: mintKeypair.publicKey});
+
     const tokenATA = await getAssociatedTokenAddress(mintKeypair.publicKey, wallet.publicKey);
 
     const createNewTokenTransaction = new Transaction().add(
@@ -142,7 +169,7 @@ const Landing: React.FC = () => {
         },
         {
           createMetadataAccountArgsV2: {
-            data: tokenMetadata,
+            data: tokenData,
             isMutable: true,
           },
         },
@@ -154,7 +181,7 @@ const Landing: React.FC = () => {
     console.log('Token created!', {
       token: mintKeypair.publicKey.toBase58(),
       tokenAccount: tokenATA.toBase58(),
-      metadata: tokenMetadata,
+      metadata: tokenData,
     });
 
     // VRF
