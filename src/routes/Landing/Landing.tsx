@@ -37,9 +37,9 @@ import ParticipantsModal from './ParticipantsModal/ParticipantsModal';
 import {FormElement, Modal, PseudoButton} from '../../components';
 import {VRFClientIDL} from '../../contracts';
 import {VRF_PROGRAM_ID} from '../../utils/Constants';
+import {autoEllipsis, waitUntil} from '../../utils/Helpers';
 
 import './styles.scss';
-import {autoEllipsis, waitUntil} from '../../utils/Helpers';
 
 const Landing: React.FC = () => {
   const [participantModalShown, setParticipantModalShown] = useState(false);

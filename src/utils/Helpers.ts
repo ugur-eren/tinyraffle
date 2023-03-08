@@ -40,8 +40,8 @@ export const waitUntil = <T>(
   condition: (value: T) => boolean,
 ): Promise<void> => {
   return new Promise((resolve) => {
-    promise.then((isReady) => {
-      if (isReady) resolve();
+    promise.then((value) => {
+      if (condition(value)) resolve();
       else waitUntil(promise, condition).then(resolve);
     });
   });
