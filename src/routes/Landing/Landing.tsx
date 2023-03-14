@@ -356,7 +356,7 @@ const Landing: React.FC = () => {
 
         <div className="p-landing__right">
           <div className="p-landing__right__header">
-            <h1 className="p-landing__right__header__title">Mini Raffle</h1>
+            <h1 className="p-landing__right__header__title">TinyRaffle</h1>
             <span className="p-landing__right__header__description">Make a Raffle in 3 steps</span>
           </div>
 
