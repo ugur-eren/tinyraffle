@@ -111,7 +111,7 @@ const Landing: React.FC = () => {
       description: 'Raffle',
 
       // TODO: Add image
-      image: 'http://via.placeholder.com/350x150',
+      image: 'https://arweave.net/0ziMdaW3j40Ib-2peIYPgoSWbrETvqUafqFquBhj7QQ',
 
       properties: {
         participants,
