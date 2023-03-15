@@ -37,7 +37,7 @@ import ParticipantsModal from './ParticipantsModal/ParticipantsModal';
 import {FormElement, Modal, PseudoButton} from '../../components';
 import {VRFClientIDL} from '../../contracts';
 import {VRF_PROGRAM_ID} from '../../utils/Constants';
-import {autoEllipsis, waitUntil} from '../../utils/Helpers';
+import {autoEllipsis} from '../../utils/Helpers';
 
 import './styles.scss';
 
@@ -204,8 +204,6 @@ const Landing: React.FC = () => {
       switchboard,
       'F8ce7MsckeZAbAGmxjJNetxYXQa9mKr9nnrC3qKubyYy',
     );
-
-    await waitUntil(queueAccount.isReady(), (isReady) => isReady);
 
     const [vrfAccount, vrfAccountTxObject] = await VrfAccount.createInstructions(
       switchboard,

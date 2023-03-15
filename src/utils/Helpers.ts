@@ -35,18 +35,6 @@ export const parseLanguageParts = (language: string, parts: Record<string, strin
   }, language);
 };
 
-export const waitUntil = <T>(
-  promise: Promise<T>,
-  condition: (value: T) => boolean,
-): Promise<void> => {
-  return new Promise((resolve) => {
-    promise.then((value) => {
-      if (condition(value)) resolve();
-      else waitUntil(promise, condition).then(resolve);
-    });
-  });
-};
-
 export const autoEllipsis = (text: string, maxLength: number): string => {
   if (text.length <= maxLength) return text;
 
